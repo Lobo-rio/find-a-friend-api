@@ -1,6 +1,7 @@
 import { hash } from "bcryptjs"
 import { OrgsRepository } from "@/repositories/abstract/orgs-repository"
 import { OrgsAlreadyExistsError } from "../errors/orgs-already-exists-error"
+import { Org } from "@prisma/client"
 
 interface RegisterOrgsUseCaseRequest {
     title: string 
@@ -9,6 +10,10 @@ interface RegisterOrgsUseCaseRequest {
     city: string 
     email: string 
     password: string
+}
+
+interface RegisterOrgsUseCaseResponse {
+    org: Org
 }
 
 export class RegisterOrgsUseCase {
@@ -25,7 +30,7 @@ export class RegisterOrgsUseCase {
             email,
             password,
         }: RegisterOrgsUseCaseRequest
-    ) {
+    ): Promise<RegisterOrgsUseCaseResponse> {
         const passwordHash = await hash(password, 8)
     
         const orgsEmailExisted = await this.orgsRepository.findByEmail(email)
@@ -45,6 +50,8 @@ export class RegisterOrgsUseCase {
             password: passwordHash,
         })
 
-        return org
+        return {
+            org,
+        }
     }
 }
