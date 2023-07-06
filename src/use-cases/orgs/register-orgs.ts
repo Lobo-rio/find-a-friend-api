@@ -1,5 +1,5 @@
-import { prisma } from "@/lib/prisma"
 import { hash } from "bcryptjs"
+import { OrgsRepository } from "@/repositories/abstract/orgs-repository"
 
 interface RegisterOrgsUseCaseRequest {
     title: string 
@@ -10,42 +10,40 @@ interface RegisterOrgsUseCaseRequest {
     password: string
 }
 
-export async function RegisterOrgsUseCase(
-    {
-        title,
-        celular,
-        address,
-        city,
-        email,
-        password,
-    }: RegisterOrgsUseCaseRequest
-) {
-    const passwordHash = await hash(password, 8)
+export class RegisterOrgsUseCase {
+    constructor(
+        private readonly orgsRepository: OrgsRepository,
+    ) {}
 
-    const orgsEmailExisted = await prisma.org.findUnique({
-        where: {
-            email,
-        }
-    })
-
-    if (orgsEmailExisted) throw new Error('E-mail elready exists!')
-
-    const orgsCelularExisted = await prisma.org.findUnique({
-        where: {
+    async execute(
+        {
+            title,
             celular,
-        }
-    })
+            address,
+            city,
+            email,
+            password,
+        }: RegisterOrgsUseCaseRequest
+    ) {
+        const passwordHash = await hash(password, 8)
+    
+        const orgsEmailExisted = await this.orgsRepository.findByEmail(email)
+    
+        if (orgsEmailExisted) throw new Error('E-mail elready exists!')
+    
+        const orgsCelularExisted = await this.orgsRepository.findByCelular(celular)
+    
+        if (orgsCelularExisted) throw new Error('Celular elready exists!')
+    
+        const org = await this.orgsRepository.create({
+            title,
+            celular,
+            address,
+            city,
+            email,
+            password: passwordHash,
+        })
 
-    if (orgsCelularExisted) throw new Error('Celular elready exists!')
-
-    await prisma.org.create({
-        data: {
-            title, 
-            celular, 
-            address, 
-            city, 
-            email, 
-            password: passwordHash
-        }
-    })
+        return org
+    }
 }
