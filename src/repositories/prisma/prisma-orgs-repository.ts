@@ -1,8 +1,21 @@
 import { prisma } from "@/lib/prisma"
 import { Prisma } from "@prisma/client"
 import { OrgsRepository } from "../abstract/orgs-repository"
+import { GetResult } from "@prisma/client/runtime"
 
 export class PrismaOrgsRepository implements OrgsRepository{
+    async findById(id: string) {
+        const org = await prisma.org.findUnique({
+            where: {
+                id,
+            }
+        })
+
+        if (!org) return null
+
+        return org
+    }
+    
     async findByEmail(email: string) {
         const org = await prisma.org.findUnique({
             where: {

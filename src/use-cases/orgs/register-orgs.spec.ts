@@ -3,12 +3,19 @@ import { compare } from "bcryptjs"
 import { InMemoryOrgsRepository } from "@/repositories/in-memory/in-memory-orgs-repository"
 import { OrgsAlreadyExistsError } from "../errors/orgs-already-exists-error"
 
-describe('Register Orgs Use Case', () => {
-    it('should be able to register org', async () => {
-        const orgsRepository = new InMemoryOrgsRepository()
-        const registerOrgsUseCase = new RegisterOrgsUseCase(orgsRepository) 
 
-        const { org } = await registerOrgsUseCase.execute({
+let orgsRepository: InMemoryOrgsRepository
+let sut: RegisterOrgsUseCase
+
+describe('Register Orgs Use Case', () => {
+    beforeEach(() => {
+        orgsRepository = new InMemoryOrgsRepository()
+        sut = new RegisterOrgsUseCase(orgsRepository) 
+    })
+
+    it('should be able to register org', async () => {
+        
+        const { org } = await sut.execute({
             title: 'Fala Mansa',
             celular: '99999999999',
             address: 'Rua Test Vitest',
@@ -21,10 +28,7 @@ describe('Register Orgs Use Case', () => {
     })
 
     it('should hash orgs password upon registration', async () => {
-        const orgsRepository = new InMemoryOrgsRepository()
-        const registerOrgsUseCase = new RegisterOrgsUseCase(orgsRepository) 
-
-        const { org } = await registerOrgsUseCase.execute({
+        const { org } = await sut.execute({
             title: 'Fala Mansa',
             celular: '99999999999',
             address: 'Rua Test Vitest',
@@ -42,12 +46,9 @@ describe('Register Orgs Use Case', () => {
     })
 
     it('should not be able to register with same email twice', async () => {
-        const orgsRepository = new InMemoryOrgsRepository()
-        const registerOrgsUseCase = new RegisterOrgsUseCase(orgsRepository) 
-
         const email = 'string@test.com'
 
-        await registerOrgsUseCase.execute({
+        await sut.execute({
             title: 'Fala Mansa',
             celular: '99999999999',
             address: 'Rua Test Vitest',
@@ -59,7 +60,7 @@ describe('Register Orgs Use Case', () => {
         
         expect(
             async () => {
-                await registerOrgsUseCase.execute({
+                await sut.execute({
                     title: 'Fala Mansa',
                     celular: '99999999999',
                     address: 'Rua Test Vitest',
@@ -72,12 +73,9 @@ describe('Register Orgs Use Case', () => {
     })
 
     it('should not be able to register with same celular twice', async () => {
-        const orgsRepository = new InMemoryOrgsRepository()
-        const registerOrgsUseCase = new RegisterOrgsUseCase(orgsRepository) 
-
         const celular = '21999999999'
 
-        await registerOrgsUseCase.execute({
+        await sut.execute({
             title: 'Fala Mansa',
             celular,
             address: 'Rua Test Vitest',
@@ -89,7 +87,7 @@ describe('Register Orgs Use Case', () => {
         
         expect(
             async () => {
-                await registerOrgsUseCase.execute({
+                await sut.execute({
                     title: 'Fala Mansa',
                     celular,
                     address: 'Rua Test Vitest',

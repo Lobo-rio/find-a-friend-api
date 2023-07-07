@@ -1,5 +1,6 @@
 import { PrismaOrgsRepository } from "@/repositories/prisma/prisma-orgs-repository"
 import { InvalidCredentialsError } from "@/use-cases/errors/invalid-credentials-error"
+import { makeAuthenticateOrgUseCase } from "@/use-cases/factories/make-authenticate-org-use-case"
 import { AuthenticateUseCase } from "@/use-cases/login/authenticate"
 import { FastifyRequest, FastifyReply } from "fastify"
 import { z } from "zod"
@@ -14,10 +15,7 @@ export async function AuthenticateOrgs(request: FastifyRequest, reply: FastifyRe
     const { email, password } = authenticateOrgSchema.parse(request.body)
 
     try {
-        const prismaOrgsRepository = new PrismaOrgsRepository()
-        const authenticateUseCase = new AuthenticateUseCase(
-            prismaOrgsRepository
-        )
+        const authenticateUseCase = makeAuthenticateOrgUseCase()
         
         const org = await authenticateUseCase.execute({
             email,
