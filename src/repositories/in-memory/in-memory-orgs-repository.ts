@@ -2,6 +2,7 @@ import { Org, Prisma } from "@prisma/client";
 import { OrgsRepository } from "../abstract/orgs-repository";
 import { GetResult } from "@prisma/client/runtime";
 import { UpdateOrgsUseCaseRequest } from "@/use-cases/orgs/update-orgs";
+import { DeleteOrgsUseCaseResponse } from "@/use-cases/orgs/delete-orgs";
 
 export class InMemoryOrgsRepository implements OrgsRepository {
     public items: Org[] = []
@@ -21,6 +22,7 @@ export class InMemoryOrgsRepository implements OrgsRepository {
 
         return org
     }
+
     async findByCelular(celular: string) {
         const org = this.items.find(item => celular === item.celular)
 
@@ -67,9 +69,7 @@ export class InMemoryOrgsRepository implements OrgsRepository {
     }
 
     async delete(id: string) {
-        const orgExisted = await this.findById(id)
         const orgIndex = this.items.findIndex((org) => id === org.id)
         this.items.splice(orgIndex, 1)
     }
-
 }

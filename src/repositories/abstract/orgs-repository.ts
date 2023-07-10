@@ -1,3 +1,4 @@
+import { DeleteOrgsUseCaseResponse } from "@/use-cases/orgs/delete-orgs"
 import { UpdateOrgsUseCaseRequest } from "@/use-cases/orgs/update-orgs"
 import { Org, Prisma } from "@prisma/client"
 
