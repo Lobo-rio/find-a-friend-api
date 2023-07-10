@@ -1,6 +1,7 @@
 import { Org, Prisma } from "@prisma/client";
 import { OrgsRepository } from "../abstract/orgs-repository";
 import { GetResult } from "@prisma/client/runtime";
+import { UpdateOrgsUseCaseRequest } from "@/use-cases/orgs/update-orgs";
 
 export class InMemoryOrgsRepository implements OrgsRepository {
     public items: Org[] = []
@@ -48,6 +49,27 @@ export class InMemoryOrgsRepository implements OrgsRepository {
         this.items.push(org)
 
         return org
+    }
+
+    async update(id: string, data: UpdateOrgsUseCaseRequest) {
+        const orgExisted = await this.findById(id)
+        
+        if (orgExisted) {
+           orgExisted.title = data.title
+           orgExisted.address = data.address
+           orgExisted.city = data.city
+           orgExisted.celular = data.celular
+           orgExisted.email = data.email
+           orgExisted.updatedAt = new Date()
+        }
+
+        return orgExisted;
+    }
+
+    async delete(id: string) {
+        const orgExisted = await this.findById(id)
+        const orgIndex = this.items.findIndex((org) => id === org.id)
+        this.items.splice(orgIndex, 1)
     }
 
 }
